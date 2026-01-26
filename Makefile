@@ -64,15 +64,6 @@ push-and-restart: push ## Push and restart all services on remote
 	@echo "Restarting services on remote..."
 	@ssh -i $(SSH_KEY) $(REMOTE_USER)@$(REMOTE_HOST) "cd $(REMOTE_PATH) && make all-restart"
 
-remote-drone-up: ## Start Drone on remote server
-	@ssh -i $(SSH_KEY) $(REMOTE_USER)@$(REMOTE_HOST) "cd $(REMOTE_PATH) && make drone-up"
-
-remote-drone-down: ## Stop Drone on remote server
-	@ssh -i $(SSH_KEY) $(REMOTE_USER)@$(REMOTE_HOST) "cd $(REMOTE_PATH) && make drone-down"
-
-remote-drone-logs: ## Show Drone logs on remote
-	@ssh -i $(SSH_KEY) $(REMOTE_USER)@$(REMOTE_HOST) "cd $(REMOTE_PATH) && make drone-logs"
-
 remote-all-down: ## Stop all services on remote
 	@ssh -i $(SSH_KEY) $(REMOTE_USER)@$(REMOTE_HOST) "cd $(REMOTE_PATH) && make all-down"
 

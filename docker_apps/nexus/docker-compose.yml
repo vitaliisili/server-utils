@@ -1,0 +1,17 @@
+services:
+  nexus:
+    image: sonatype/nexus3:${NEXUS_IMAGE_TAG:-3.87.2}
+    container_name: nexus
+    restart: unless-stopped
+    ports:
+      - "${NEXUS_PORT:-8088}:8081"
+    volumes:
+      - nexus-data:/nexus-data
+    networks:
+      - nexus-network
+
+volumes:
+  nexus-data:
+
+networks:
+  nexus-network:

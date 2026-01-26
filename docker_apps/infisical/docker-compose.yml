@@ -1,0 +1,66 @@
+services:
+  vs-infisical-backend:
+    container_name: vs-infisical-backend
+    image: infisical/infisical:v0.155.6
+    restart: unless-stopped
+    depends_on:
+      vs-infisical-db:
+        condition: service_healthy
+      vs-infisical-redis:
+        condition: service_started
+    ports:
+      - "3331:8080"
+    environment:
+      NODE_ENV: "production"
+      ENCRYPTION_KEY: "${ENCRYPTION_KEY}"
+      AUTH_SECRET: "${AUTH_SECRET}"
+
+      SITE_URL: "${SITE_URL}"
+      SMTP_HOST: "${SMTP_HOST}"
+      SMTP_PORT: "${SMTP_PORT}"
+      SMTP_USERNAME: "${SMTP_USERNAME}"
+      SMTP_PASSWORD: "${SMTP_PASSWORD}"
+      SMTP_FROM_ADDRESS: "${SMTP_FROM_ADDRESS}"
+      SMTP_FROM_NAME: "${SMTP_FROM_NAME}"
+
+      # Build connection strings from vars
+      DB_CONNECTION_URI: "postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@vs-infisical-db:5432/${POSTGRES_DB}"
+      REDIS_URL: "redis://vs-infisical-redis:6379"
+    networks:
+      - vs-infisical
+
+  vs-infisical-redis:
+    container_name: vs-infisical-redis
+    image: redis:7
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - vs_infisical_redis_data:/data
+    networks:
+      - vs-infisical
+
+  vs-infisical-db:
+    container_name: vs-infisical-db
+    image: postgres:14-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: "${POSTGRES_USER}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
+      POSTGRES_DB: "${POSTGRES_DB}"
+    volumes:
+      - vs_infisical_pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    networks:
+      - vs-infisical
+
+volumes:
+  vs_infisical_pg_data:
+  vs_infisical_redis_data:
+
+networks:
+  vs-infisical:
+    name: vs-infisical
