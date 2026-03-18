@@ -1,0 +1,63 @@
+services:
+  linkwarden-postgres:
+    image: postgres:16-alpine
+    container_name: linkwarden-postgres
+    hostname: linkwarden-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${LINKWARDEN_POSTGRES_DB}
+      POSTGRES_USER: ${LINKWARDEN_POSTGRES_USER}
+      POSTGRES_PASSWORD: ${LINKWARDEN_POSTGRES_PASSWORD}
+    volumes:
+      - ./data/postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${LINKWARDEN_POSTGRES_USER} -d ${LINKWARDEN_POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks:
+      - linkwarden-network
+
+  linkwarden-meilisearch:
+    image: getmeili/meilisearch:v1.12.8
+    container_name: linkwarden-meilisearch
+    hostname: linkwarden-meilisearch
+    restart: unless-stopped
+    environment:
+      MEILI_MASTER_KEY: ${LINKWARDEN_MEILI_MASTER_KEY}
+      MEILI_NO_ANALYTICS: "true"
+    volumes:
+      - ./data/meili:/meili_data
+    networks:
+      - linkwarden-network
+
+  linkwarden:
+    image: ghcr.io/linkwarden/linkwarden:latest
+    container_name: linkwarden
+    hostname: linkwarden
+    restart: unless-stopped
+    depends_on:
+      linkwarden-postgres:
+        condition: service_healthy
+      linkwarden-meilisearch:
+        condition: service_started
+    environment:
+      NEXTAUTH_URL: ${LINKWARDEN_NEXTAUTH_URL}
+      NEXTAUTH_SECRET: ${LINKWARDEN_NEXTAUTH_SECRET}
+      NEXT_PUBLIC_DISABLE_REGISTRATION: ${LINKWARDEN_DISABLE_REGISTRATION:-true}
+      DATABASE_URL: postgresql://${LINKWARDEN_POSTGRES_USER}:${LINKWARDEN_POSTGRES_PASSWORD}@linkwarden-postgres:5432/${LINKWARDEN_POSTGRES_DB}
+      MEILI_HOST: http://linkwarden-meilisearch:7700
+      MEILI_MASTER_KEY: ${LINKWARDEN_MEILI_MASTER_KEY}
+    cap_add:
+      - SYS_ADMIN
+    volumes:
+      - ./data/linkwarden:/data/data
+    ports:
+      - "${LINKWARDEN_APP_PORT:-38100}:3000"
+    networks:
+      - linkwarden-network
+
+networks:
+  linkwarden-network:
+    name: linkwarden-network
+    driver: bridge

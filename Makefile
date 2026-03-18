@@ -9,15 +9,22 @@ endif
 # Remote server configuration - EDIT THESE IF ENV FILE IS NOT PRESENT
 REMOTE_USER ?= ubuntu
 REMOTE_HOST ?= your-server-ip
-REMOTE_PATH ?= /home/ubuntu/docker_apps
 SSH_KEY ?= ~/.ssh/id_rsa
+
+# Derive home directory from user (root uses /root, others use /home/<user>)
+ifeq ($(REMOTE_USER),root)
+    REMOTE_HOME ?= /root
+else
+    REMOTE_HOME ?= /home/$(REMOTE_USER)
+endif
+REMOTE_PATH ?= $(REMOTE_HOME)/docker_apps
 
 # Local path to sync
 LOCAL_PATH := ./docker_apps
 
 # Rsync options
 RSYNC_OPTS := -avz --progress --delete
-RSYNC_EXCLUDE := --exclude='backups/' --exclude='*.log' --exclude='.git/' --exclude='*.swp' --exclude='.DS_Store' --exclude='__pycache__/' --exclude='app_example/'
+RSYNC_EXCLUDE := --exclude='data/' --exclude='backups/' --exclude='*.log' --exclude='.git/' --exclude='*.swp' --exclude='.DS_Store' --exclude='__pycache__/' --exclude='app_example/'
 SSH_OPTS := -e "ssh -i $(SSH_KEY)"
 
 help: ## Show deployment commands

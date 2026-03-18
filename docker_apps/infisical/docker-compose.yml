@@ -1,0 +1,61 @@
+services:
+  grand-digital-infisical-backend:
+    container_name: grand-digital-infisical-backend
+    image: infisical/infisical:v0.155.6
+    restart: unless-stopped
+    depends_on:
+      grand-digital-infisical-db:
+        condition: service_healthy
+      grand-digital-infisical-redis:
+        condition: service_started
+    ports:
+      - "3331:8080"
+    environment:
+      NODE_ENV: "production"
+
+      # Required (provided via .env or Portainer stack env vars)
+      ENCRYPTION_KEY: "${ENCRYPTION_KEY}"
+      AUTH_SECRET: "${AUTH_SECRET}"
+      SITE_URL: "${SITE_URL}"
+
+      # Build connection strings from vars
+      DB_CONNECTION_URI: "postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@grand-digital-infisical-db:5432/${POSTGRES_DB}"
+      REDIS_URL: "redis://grand-digital-infisical-redis:6379"
+    networks:
+      - grand-digital-infisical
+
+  grand-digital-infisical-redis:
+    container_name: grand-digital-infisical-redis
+    image: redis:7
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - grand_digital_infisical_redis_data:/data
+    networks:
+      - grand-digital-infisical
+
+  grand-digital-infisical-db:
+    container_name: grand-digital-infisical-db
+    image: postgres:14-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: "${POSTGRES_USER}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
+      POSTGRES_DB: "${POSTGRES_DB}"
+    volumes:
+      - grand_digital_infisical_pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    networks:
+      - grand-digital-infisical
+
+volumes:
+  grand_digital_infisical_pg_data:
+  grand_digital_infisical_redis_data:
+
+networks:
+  grand-digital-infisical:
+    name: grand-digital-infisical

@@ -9,6 +9,7 @@ include n8n/Makefile
 include portainer/Makefile
 include rocketchat/Makefile
 include nextcloud/Makefile
+include linkwarden/Makefile
 
 help: ## Show all available commands
 	@echo "=== Docker Apps Management ==="
@@ -37,6 +38,9 @@ help: ## Show all available commands
 	@echo "=== Nextcloud ==="
 	@$(MAKE) -s nextcloud-help
 	@echo ""
+	@echo "=== Linkwarden ==="
+	@$(MAKE) -s linkwarden-help
+	@echo ""
 
 all-up: ## Start all services
 	@echo "Starting all services..."
@@ -46,6 +50,7 @@ all-up: ## Start all services
 	@$(MAKE) portainer-up
 	@$(MAKE) rocketchat-up
 	@$(MAKE) nextcloud-up
+	@$(MAKE) linkwarden-up
 	@echo "All services started!"
 
 all-down: ## Stop all services
@@ -56,6 +61,7 @@ all-down: ## Stop all services
 	@$(MAKE) portainer-down
 	@$(MAKE) rocketchat-down
 	@$(MAKE) nextcloud-down
+	@$(MAKE) linkwarden-down
 	@echo "All services stopped!"
 
 all-restart: ## Restart all services
@@ -66,6 +72,7 @@ all-restart: ## Restart all services
 	@$(MAKE) portainer-restart
 	@$(MAKE) rocketchat-restart
 	@$(MAKE) nextcloud-restart
+	@$(MAKE) linkwarden-restart
 	@echo "All services restarted!"
 
 all-status: ## Show status of all services
@@ -86,3 +93,6 @@ all-status: ## Show status of all services
 	@echo ""
 	@echo "=== Nextcloud Status ==="
 	@$(MAKE) nextcloud-status
+	@echo ""
+	@echo "=== Linkwarden Status ==="
+	@$(MAKE) linkwarden-status
