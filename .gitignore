@@ -1,3 +1,4 @@
 .idea/
 **/.env
+**/.infisical-auth
 app_example/
