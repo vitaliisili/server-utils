@@ -272,7 +272,7 @@ services:
       DISABLE_TELEMETRY: "true"
       TZ: ${TZ:-UTC}
     ports:
-      - "${ONEUPTIME_HTTP_PORT:-80}:7849"
+      - "${ONEUPTIME_HTTP_PORT:-3210}:7849"
     networks:
       - oneuptime-network
 
