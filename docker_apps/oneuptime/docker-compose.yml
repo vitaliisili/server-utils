@@ -164,7 +164,7 @@ services:
       oneuptime-clickhouse:
         condition: service_healthy
     environment:
-      ONEUPTIME_URL: http://oneuptime-ingress:7849
+      ONEUPTIME_URL: http://oneuptime-telemetry:3403
       REGISTER_PROBE_KEY: ${REGISTER_PROBE_KEY}
       PROBE_NAME: "Probe"
       PROBE_DESCRIPTION: "Global probe to monitor oneuptime resources"
