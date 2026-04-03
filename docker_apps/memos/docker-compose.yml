@@ -1,0 +1,17 @@
+services:
+  memos:
+    image: neosmemo/memos:${MEMOS_IMAGE_TAG:-stable}
+    container_name: memos
+    restart: unless-stopped
+    ports:
+      - "${MEMOS_PORT:-5230}:5230"
+    volumes:
+      - memos-data:/var/opt/memos
+    networks:
+      - memos-network
+
+volumes:
+  memos-data:
+
+networks:
+  memos-network:

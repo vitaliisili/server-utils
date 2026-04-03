@@ -15,6 +15,7 @@ include docker_apps/rocketchat/Makefile
 include docker_apps/nextcloud/Makefile
 include docker_apps/linkwarden/Makefile
 include docker_apps/komodo/Makefile
+include docker_apps/memos/Makefile
 include docker_apps/oneuptime/Makefile
 
 # Remote server configuration - EDIT THESE IF ENV FILE IS NOT PRESENT
@@ -59,6 +60,8 @@ help: ## Show all available commands
 	@$(MAKE) -s linkwarden-help
 	@echo ""
 	@$(MAKE) -s komodo-help
+	@echo ""
+	@$(MAKE) -s memos-help
 	@echo ""
 	@$(MAKE) -s oneuptime-help
 
