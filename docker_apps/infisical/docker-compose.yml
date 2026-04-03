@@ -1,12 +1,12 @@
 services:
-  vs-infisical-backend:
-    container_name: vs-infisical-backend
+  infisical-backend:
+    container_name: infisical-backend
     image: infisical/infisical:v0.155.6
     restart: unless-stopped
     depends_on:
-      vs-infisical-db:
+      infisical-db:
         condition: service_healthy
-      vs-infisical-redis:
+      infisical-redis:
         condition: service_started
     ports:
       - "3331:8080"
@@ -26,23 +26,23 @@ services:
       SMTP_FROM_NAME: "${SMTP_FROM_NAME}"
 
       # Build connection strings from vars
-      DB_CONNECTION_URI: "postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@vs-infisical-db:5432/${POSTGRES_DB}"
-      REDIS_URL: "redis://vs-infisical-redis:6379"
+      DB_CONNECTION_URI: "postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@infisical-db:5432/${POSTGRES_DB}"
+      REDIS_URL: "redis://infisical-redis:6379"
     networks:
-      - vs-infisical
+      - infisical
 
-  vs-infisical-redis:
-    container_name: vs-infisical-redis
+  infisical-redis:
+    container_name: infisical-redis
     image: redis:7
     restart: unless-stopped
     command: ["redis-server", "--appendonly", "yes"]
     volumes:
       - vs_infisical_redis_data:/data
     networks:
-      - vs-infisical
+      - infisical
 
-  vs-infisical-db:
-    container_name: vs-infisical-db
+  infisical-db:
+    container_name: infisical-db
     image: postgres:14-alpine
     restart: unless-stopped
     environment:
@@ -57,12 +57,12 @@ services:
       timeout: 5s
       retries: 20
     networks:
-      - vs-infisical
+      - infisical
 
 volumes:
   vs_infisical_pg_data:
   vs_infisical_redis_data:
 
 networks:
-  vs-infisical:
-    name: vs-infisical
+  infisical:
+    name: infisical
