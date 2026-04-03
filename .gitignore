@@ -1,4 +1,4 @@
 .idea/
 **/.env
-**/harbor-installer/
+**/.infisical-auth
 app_example/

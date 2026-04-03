@@ -1,0 +1,75 @@
+services:
+  komodo-mongo:
+    image: mongo:7.0
+    container_name: komodo-mongo
+    hostname: komodo-mongo
+    restart: unless-stopped
+    command: --quiet --wiredTigerCacheSizeGB 0.25
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${KOMODO_DB_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${KOMODO_DB_PASSWORD}
+    volumes:
+      - ./data/mongo:/data/db
+      - ./data/mongo-config:/data/configdb
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.runCommand({ ping: 1 })"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks:
+      - komodo-network
+    labels:
+      komodo.skip:
+
+  komodo-core:
+    image: ghcr.io/moghtech/komodo-core:2
+    init: true
+    container_name: komodo-core
+    hostname: komodo-core
+    restart: unless-stopped
+    depends_on:
+      komodo-mongo:
+        condition: service_healthy
+    environment:
+      KOMODO_HOST: ${KOMODO_HOST}
+      KOMODO_PASSKEY: ${KOMODO_PASSKEY}
+      KOMODO_JWT_SECRET: ${KOMODO_JWT_SECRET}
+      KOMODO_LOCAL_AUTH: "true"
+      KOMODO_DISABLE_USER_REGISTRATION: "true"
+      KOMODO_FIRST_SERVER: https://komodo-periphery:8120
+      KOMODO_DATABASE_ADDRESS: komodo-mongo:27017
+      KOMODO_DATABASE_USERNAME: ${KOMODO_DB_USERNAME}
+      KOMODO_DATABASE_PASSWORD: ${KOMODO_DB_PASSWORD}
+      TZ: ${TZ:-UTC}
+    volumes:
+      - ./data/backups:/backups
+      - ./keys:/config/keys
+    ports:
+      - "${KOMODO_APP_PORT:-9120}:9120"
+    networks:
+      - komodo-network
+    labels:
+      komodo.skip:
+
+  komodo-periphery:
+    image: ghcr.io/moghtech/komodo-periphery:2
+    container_name: komodo-periphery
+    hostname: komodo-periphery
+    restart: unless-stopped
+    environment:
+      PERIPHERY_PASSKEYS: ${KOMODO_PASSKEY}
+      PERIPHERY_SSL_ENABLED: "false"
+      TZ: ${TZ:-UTC}
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /proc:/proc
+      - /etc/komodo:/etc/komodo
+    networks:
+      - komodo-network
+    labels:
+      komodo.skip:
+
+networks:
+  komodo-network:
+    name: komodo-network
+    driver: bridge

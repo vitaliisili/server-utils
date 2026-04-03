@@ -1,0 +1,3 @@
+command -v infisical || (curl -1sLf 'https://artifacts-cli.infisical.com/setup.deb.sh' | bash && DEBIAN_FRONTEND=noninteractive apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y infisical)
+TOKEN=$(infisical login --method=universal-auth --client-id=[[INFISICAL_CLIENT_ID]] --client-secret=[[INFISICAL_CLIENT_SECRET]] --domain=https://infisical.vitaliisili.com --plain --silent)
+infisical export --token=$TOKEN --domain=https://infisical.vitaliisili.com --projectId=[[INFISICAL_PROJECT_ID]] --env=prod --format=dotenv > .env
