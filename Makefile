@@ -17,6 +17,7 @@ include docker_apps/linkwarden/Makefile
 include docker_apps/komodo/Makefile
 include docker_apps/memos/Makefile
 include docker_apps/oneuptime/Makefile
+include docker_apps/trilium/Makefile
 
 # Remote server configuration - EDIT THESE IF ENV FILE IS NOT PRESENT
 REMOTE_USER ?= ubuntu
@@ -64,6 +65,8 @@ help: ## Show all available commands
 	@$(MAKE) -s memos-help
 	@echo ""
 	@$(MAKE) -s oneuptime-help
+	@echo ""
+	@$(MAKE) -s trilium-help
 
 push: ## Push docker_apps to remote server
 	@echo "Pushing $(LOCAL_PATH) to $(REMOTE_USER)@$(REMOTE_HOST):$(REMOTE_PATH)"
