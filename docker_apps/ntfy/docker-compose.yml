@@ -1,0 +1,22 @@
+services:
+  ntfy:
+    image: binwiederhier/ntfy:${NTFY_IMAGE_TAG:-latest}
+    container_name: ${CONTAINER_NAME:-ntfy}
+    restart: unless-stopped
+    command: serve
+    ports:
+      - "${NTFY_PORT:-8093}:80"
+    volumes:
+      - ntfy-cache:/var/cache/ntfy
+      - ntfy-data:/etc/ntfy
+    networks:
+      - ntfy-network
+
+volumes:
+  ntfy-cache:
+    name: ${CACHE_VOLUME_NAME:-ntfy-cache}
+  ntfy-data:
+    name: ${DATA_VOLUME_NAME:-ntfy-data}
+
+networks:
+  ntfy-network:
