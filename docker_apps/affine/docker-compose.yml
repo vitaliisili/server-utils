@@ -1,0 +1,90 @@
+services:
+  affine:
+    image: ghcr.io/toeverything/affine:${AFFINE_IMAGE_TAG:-stable}
+    container_name: ${CONTAINER_NAME:-affine}
+    restart: unless-stopped
+    depends_on:
+      affine-redis:
+        condition: service_healthy
+      affine-postgres:
+        condition: service_healthy
+      affine-migration:
+        condition: service_completed_successfully
+    environment:
+      REDIS_SERVER_HOST: affine-redis
+      DATABASE_URL: "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@affine-postgres:5432/${POSTGRES_DB}"
+      AFFINE_INDEXER_ENABLED: "false"
+      AFFINE_SERVER_HOST: ${AFFINE_SERVER_HOST}
+      AFFINE_SERVER_HTTPS: "true"
+    volumes:
+      - affine-storage:/root/.affine/storage
+      - affine-config:/root/.affine/config
+    ports:
+      - "${AFFINE_PORT:-3010}:3010"
+    networks:
+      - affine-network
+
+  affine-migration:
+    image: ghcr.io/toeverything/affine:${AFFINE_IMAGE_TAG:-stable}
+    container_name: affine-migration
+    command: ['sh', '-c', 'node ./scripts/self-host-predeploy.js']
+    depends_on:
+      affine-postgres:
+        condition: service_healthy
+      affine-redis:
+        condition: service_healthy
+    environment:
+      REDIS_SERVER_HOST: affine-redis
+      DATABASE_URL: "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@affine-postgres:5432/${POSTGRES_DB}"
+      AFFINE_INDEXER_ENABLED: "false"
+    volumes:
+      - affine-storage:/root/.affine/storage
+      - affine-config:/root/.affine/config
+    networks:
+      - affine-network
+
+  affine-redis:
+    image: redis:${AFFINE_REDIS_IMAGE_TAG:-7-alpine}
+    container_name: affine-redis
+    restart: unless-stopped
+    healthcheck:
+      test: ['CMD', 'redis-cli', '--raw', 'incr', 'ping']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - affine-redis-data:/data
+    networks:
+      - affine-network
+
+  affine-postgres:
+    image: pgvector/pgvector:${AFFINE_POSTGRES_IMAGE_TAG:-pg16}
+    container_name: affine-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_INITDB_ARGS: '--data-checksums'
+    volumes:
+      - affine-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD', 'pg_isready', '-U', '${POSTGRES_USER}', '-d', '${POSTGRES_DB}']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - affine-network
+
+volumes:
+  affine-storage:
+    name: ${STORAGE_VOLUME_NAME:-affine-storage}
+  affine-config:
+    name: ${CONFIG_VOLUME_NAME:-affine-config}
+  affine-redis-data:
+    name: ${REDIS_VOLUME_NAME:-affine-redis-data}
+  affine-postgres-data:
+    name: ${POSTGRES_VOLUME_NAME:-affine-postgres-data}
+
+networks:
+  affine-network:
