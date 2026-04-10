@@ -4,19 +4,55 @@ services:
     container_name: ${CONTAINER_NAME:-ntfy}
     restart: unless-stopped
     command: serve
+    depends_on:
+      ntfy-postgres:
+        condition: service_healthy
+    environment:
+      NTFY_BASE_URL: ${NTFY_BASE_URL}
+      NTFY_BEHIND_PROXY: "true"
+      NTFY_DATABASE_URL: "postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@ntfy-postgres:5432/${POSTGRES_DB}"
+      NTFY_AUTH_DEFAULT_ACCESS: "deny-all"
+      NTFY_ENABLE_LOGIN: "true"
+      NTFY_REQUIRE_LOGIN: "true"
+      NTFY_ATTACHMENT_CACHE_DIR: "/var/cache/ntfy/attachments"
+      NTFY_ATTACHMENT_FILE_SIZE_LIMIT: ${NTFY_ATTACHMENT_FILE_SIZE_LIMIT:-100M}
+      NTFY_ATTACHMENT_TOTAL_SIZE_LIMIT: ${NTFY_ATTACHMENT_TOTAL_SIZE_LIMIT:-10G}
+      NTFY_SMTP_SENDER_ADDR: ${NTFY_SMTP_SENDER_ADDR}
+      NTFY_SMTP_SENDER_FROM: ${NTFY_SMTP_SENDER_FROM}
+      NTFY_SMTP_SENDER_USER: ${NTFY_SMTP_SENDER_USER}
+      NTFY_SMTP_SENDER_PASS: ${NTFY_SMTP_SENDER_PASS}
+      NTFY_UPSTREAM_BASE_URL: "https://ntfy.sh"
+      NTFY_AUTH_USERS: ${NTFY_AUTH_USERS}
+    volumes:
+      - ntfy-attachments:/var/cache/ntfy/attachments
     ports:
       - "${NTFY_PORT:-8093}:80"
+    networks:
+      - ntfy-network
+
+  ntfy-postgres:
+    image: postgres:16-alpine
+    container_name: ntfy-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
     volumes:
-      - ntfy-cache:/var/cache/ntfy
-      - ntfy-data:/etc/ntfy
+      - ntfy-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
     networks:
       - ntfy-network
 
 volumes:
-  ntfy-cache:
-    name: ${CACHE_VOLUME_NAME:-ntfy-cache}
-  ntfy-data:
-    name: ${DATA_VOLUME_NAME:-ntfy-data}
+  ntfy-attachments:
+    name: ${ATTACHMENTS_VOLUME_NAME:-ntfy-attachments}
+  ntfy-postgres-data:
+    name: ${POSTGRES_VOLUME_NAME:-ntfy-postgres-data}
 
 networks:
   ntfy-network:

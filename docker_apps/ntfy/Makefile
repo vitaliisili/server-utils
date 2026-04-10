@@ -1,4 +1,4 @@
-.PHONY: ntfy-help ntfy-up ntfy-down ntfy-restart ntfy-logs ntfy-status ntfy-shell ntfy-clean ntfy-pull ntfy-update
+.PHONY: ntfy-help ntfy-up ntfy-down ntfy-restart ntfy-logs ntfy-status ntfy-shell ntfy-clean ntfy-pull ntfy-update ntfy-secrets
 
 NTFY_DIR := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 
@@ -49,3 +49,20 @@ ntfy-update: ## Update ntfy to latest version
 	@cd $(NTFY_DIR) && docker compose pull
 	@cd $(NTFY_DIR) && docker compose up -d
 	@echo "ntfy updated!"
+
+ntfy-secrets: ## Pull secrets from Infisical and generate .env
+	@echo "Fetching ntfy secrets from Infisical..."
+	@if [ ! -f $(NTFY_DIR).infisical-auth ]; then \
+		echo "ERROR: .infisical-auth file not found."; \
+		echo "Create it with two lines:"; \
+		echo "  CLIENT_ID=your-client-id"; \
+		echo "  CLIENT_SECRET=your-client-secret"; \
+		exit 1; \
+	fi
+	@cd $(NTFY_DIR) && \
+		export $$(cat .infisical-auth | xargs) && \
+		PROJECT_ID=$$(cat infisical.json | python3 -c "import sys,json; print(json.load(sys.stdin)['workspaceId'])") && \
+		ENV=$$(cat infisical.json | python3 -c "import sys,json; print(json.load(sys.stdin)['defaultEnvironment'])") && \
+		TOKEN=$$(infisical login --method=universal-auth --client-id=$$CLIENT_ID --client-secret=$$CLIENT_SECRET --domain=$$DOMAIN --plain --silent) && \
+		infisical export --token=$$TOKEN --domain=$$DOMAIN --projectId=$$PROJECT_ID --env=$$ENV --format=dotenv > .env
+	@echo "Secrets saved to .env"
