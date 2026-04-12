@@ -22,6 +22,7 @@ include docker_apps/ntfy/Makefile
 include docker_apps/affine/Makefile
 include docker_apps/homarr/Makefile
 include docker_apps/dockhand/Makefile
+include docker_apps/rancher/Makefile
 
 # Remote server configuration - EDIT THESE IF ENV FILE IS NOT PRESENT
 REMOTE_USER ?= ubuntu
@@ -79,6 +80,8 @@ help: ## Show all available commands
 	@$(MAKE) -s homarr-help
 	@echo ""
 	@$(MAKE) -s dockhand-help
+	@echo ""
+	@$(MAKE) -s rancher-help
 
 push: ## Push docker_apps to remote server
 	@echo "Pushing $(LOCAL_PATH) to $(REMOTE_USER)@$(REMOTE_HOST):$(REMOTE_PATH)"

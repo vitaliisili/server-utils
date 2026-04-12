@@ -1,0 +1,27 @@
+services:
+  rancher:
+    image: rancher/rancher:${RANCHER_IMAGE_TAG:-latest}
+    container_name: ${CONTAINER_NAME:-rancher}
+    restart: unless-stopped
+    privileged: true
+    command: --no-cacerts
+    environment:
+      CATTLE_BOOTSTRAP_PASSWORD: ${RANCHER_BOOTSTRAP_PASSWORD}
+      AUDIT_LEVEL: ${RANCHER_AUDIT_LEVEL:-1}
+    volumes:
+      - rancher-data:/var/lib/rancher
+      - rancher-auditlog:/var/log/auditlog
+    ports:
+      - "${RANCHER_HTTP_PORT:-9080}:80"
+      - "${RANCHER_HTTPS_PORT:-9443}:443"
+    networks:
+      - rancher-network
+
+volumes:
+  rancher-data:
+    name: ${DATA_VOLUME_NAME:-rancher-data}
+  rancher-auditlog:
+    name: ${AUDITLOG_VOLUME_NAME:-rancher-auditlog}
+
+networks:
+  rancher-network:
