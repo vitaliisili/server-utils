@@ -1,4 +1,4 @@
-.PHONY: affine-help affine-up affine-down affine-restart affine-logs affine-status affine-shell affine-clean affine-pull affine-update affine-secrets
+.PHONY: affine-help affine-up affine-down affine-restart affine-logs affine-status affine-shell affine-clean affine-pull affine-update
 
 AFFINE_DIR := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 
@@ -49,20 +49,3 @@ affine-update: ## Update affine to latest version
 	@cd $(AFFINE_DIR) && docker compose pull
 	@cd $(AFFINE_DIR) && docker compose up -d
 	@echo "affine updated!"
-
-affine-secrets: ## Pull secrets from Infisical and generate .env
-	@echo "Fetching affine secrets from Infisical..."
-	@if [ ! -f $(AFFINE_DIR).infisical-auth ]; then \
-		echo "ERROR: .infisical-auth file not found."; \
-		echo "Create it with two lines:"; \
-		echo "  CLIENT_ID=your-client-id"; \
-		echo "  CLIENT_SECRET=your-client-secret"; \
-		exit 1; \
-	fi
-	@cd $(AFFINE_DIR) && \
-		export $$(cat .infisical-auth | xargs) && \
-		PROJECT_ID=$$(cat infisical.json | python3 -c "import sys,json; print(json.load(sys.stdin)['workspaceId'])") && \
-		ENV=$$(cat infisical.json | python3 -c "import sys,json; print(json.load(sys.stdin)['defaultEnvironment'])") && \
-		TOKEN=$$(infisical login --method=universal-auth --client-id=$$CLIENT_ID --client-secret=$$CLIENT_SECRET --domain=$$DOMAIN --plain --silent) && \
-		infisical export --token=$$TOKEN --domain=$$DOMAIN --projectId=$$PROJECT_ID --env=$$ENV --format=dotenv > .env
-	@echo "Secrets saved to .env"

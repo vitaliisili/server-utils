@@ -1,0 +1,21 @@
+services:
+  homarr:
+    image: ghcr.io/homarr-labs/homarr:${HOMARR_IMAGE_TAG:-latest}
+    container_name: ${CONTAINER_NAME:-homarr}
+    restart: unless-stopped
+    environment:
+      SECRET_ENCRYPTION_KEY: ${SECRET_ENCRYPTION_KEY}
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - homarr-appdata:/appdata
+    ports:
+      - "${HOMARR_PORT:-7575}:7575"
+    networks:
+      - homarr-network
+
+volumes:
+  homarr-appdata:
+    name: ${APPDATA_VOLUME_NAME:-homarr-appdata}
+
+networks:
+  homarr-network:

@@ -4,24 +4,6 @@ This app runs OneUptime with PostgreSQL, Redis, and ClickHouse using Docker Comp
 
 ## Setup
 
-### Option A — Infisical (recommended)
-
-1. Set `workspaceId` in `infisical.json` to your OneUptime project ID.
-2. Create `.infisical-auth` with your machine identity credentials:
-
-   CLIENT_ID=your-client-id
-   CLIENT_SECRET=your-client-secret
-   DOMAIN=https://your-infisical-domain.com
-
-3. Pull secrets and start:
-
-   make oneuptime-secrets
-   make oneuptime-up
-
-> `.infisical-auth` is excluded from rsync and git — it stays local only.
-
-### Option B — Manual
-
 1. Copy `.env-example` to `.env` and fill in values.
 2. Start the stack:
 

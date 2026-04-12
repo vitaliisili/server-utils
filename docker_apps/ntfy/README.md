@@ -20,4 +20,4 @@ This app runs ntfy with PostgreSQL using Docker Compose.
 - Attachments are stored in the `ntfy-attachments` volume.
 - PostgreSQL data is stored in the `ntfy-postgres-data` volume.
 - If you put ntfy behind a reverse proxy, point it to `http://127.0.0.1:${NTFY_PORT}`.
-- Secrets are managed via Infisical (see `infisical.json`).
+- Secrets are stored in the `.env` file (excluded from git).
