@@ -21,6 +21,7 @@ Point any Docker management tool — [Komodo](https://komo.do/), [Dockhand](http
 | [Memos](docker_apps/memos) | Lightweight note-taking | 5230 |
 | [n8n](docker_apps/n8n) | Workflow automation | 5678 |
 | [Nextcloud](docker_apps/nextcloud) | File storage and collaboration | 8285 |
+| [Novu](docker_apps/novu) | Notification infrastructure for developers | 4400 |
 | [ntfy](docker_apps/ntfy) | Push notifications | 8093 |
 | [OneUptime](docker_apps/oneuptime) | Uptime monitoring and status pages | 3210 |
 | [Portainer](docker_apps/portainer) | Docker management UI | — |
