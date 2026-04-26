@@ -5,6 +5,8 @@ services:
     restart: unless-stopped
     ports:
       - "${MEMOS_PORT:-5230}:5230"
+    environment:
+      - MEMOS_INSTANCE_URL=${MEMOS_INSTANCE_URL}
     volumes:
       - memos-data:/var/opt/memos
     networks:
