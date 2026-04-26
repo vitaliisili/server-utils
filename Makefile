@@ -24,6 +24,7 @@ include docker_apps/homarr/Makefile
 include docker_apps/dockhand/Makefile
 include docker_apps/rancher/Makefile
 include docker_apps/novu/Makefile
+include docker_apps/snapotter/Makefile
 
 # Remote server configuration - EDIT THESE IF ENV FILE IS NOT PRESENT
 REMOTE_USER ?= ubuntu
@@ -85,6 +86,8 @@ help: ## Show all available commands
 	@$(MAKE) -s rancher-help
 	@echo ""
 	@$(MAKE) -s novu-help
+	@echo ""
+	@$(MAKE) -s snapotter-help
 
 push: ## Push docker_apps to remote server
 	@echo "Pushing $(LOCAL_PATH) to $(REMOTE_USER)@$(REMOTE_HOST):$(REMOTE_PATH)"

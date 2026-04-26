@@ -1,0 +1,44 @@
+services:
+  snapotter:
+    image: snapotter/snapotter:${SNAPOTTER_IMAGE_TAG:-latest}
+    container_name: ${CONTAINER_NAME:-snapotter}
+    restart: unless-stopped
+    ports:
+      - "${SNAPOTTER_PORT:-1349}:1349"
+    volumes:
+      - snapotter-data:/data
+      - snapotter-workspace:/tmp/workspace
+    environment:
+      AUTH_ENABLED: ${AUTH_ENABLED:-true}
+      DEFAULT_USERNAME: ${DEFAULT_USERNAME:-admin}
+      DEFAULT_PASSWORD: ${DEFAULT_PASSWORD:-admin}
+      MAX_UPLOAD_SIZE_MB: ${MAX_UPLOAD_SIZE_MB:-0}
+      MAX_BATCH_SIZE: ${MAX_BATCH_SIZE:-0}
+      RATE_LIMIT_PER_MIN: ${RATE_LIMIT_PER_MIN:-0}
+      MAX_USERS: ${MAX_USERS:-0}
+      TRUST_PROXY: ${TRUST_PROXY:-true}
+      PUID: ${PUID:-1000}
+      PGID: ${PGID:-1000}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:1349/api/v1/health"]
+      interval: 30s
+      timeout: 5s
+      start_period: 60s
+      retries: 3
+    shm_size: "2gb"
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    networks:
+      - snapotter-network
+
+volumes:
+  snapotter-data:
+    name: ${DATA_VOLUME_NAME:-snapotter-data}
+  snapotter-workspace:
+    name: ${WORKSPACE_VOLUME_NAME:-snapotter-workspace}
+
+networks:
+  snapotter-network:

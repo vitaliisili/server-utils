@@ -27,6 +27,7 @@ Point any Docker management tool — [Komodo](https://komo.do/), [Dockhand](http
 | [Portainer](docker_apps/portainer) | Docker management UI | — |
 | [Rancher](docker_apps/rancher) | Kubernetes container management platform | 9443 |
 | [Rocket.Chat](docker_apps/rocketchat) | Team communication | — |
+| [SnapOtter](docker_apps/snapotter) | Self-hosted image processing with local AI | 1349 |
 | [Trilium](docker_apps/trilium) | Personal knowledge base | — |
 
 ## Quick Start
