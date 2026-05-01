@@ -1,0 +1,22 @@
+services:
+  ddns-updater:
+    image: ghcr.io/qdm12/ddns-updater:${DDNS_UPDATER_IMAGE_TAG:-latest}
+    container_name: ${CONTAINER_NAME:-ddns-updater}
+    restart: unless-stopped
+    ports:
+      - "${DDNS_UPDATER_PORT:-8000}:8000/tcp"
+    volumes:
+      - ddns-updater-data:/updater/data
+    environment:
+      PERIOD: ${PERIOD:-5m}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+      TZ: ${TZ:-Europe/Berlin}
+    networks:
+      - ddns-updater-network
+
+volumes:
+  ddns-updater-data:
+    name: ${VOLUME_NAME:-ddns-updater-data}
+
+networks:
+  ddns-updater-network:

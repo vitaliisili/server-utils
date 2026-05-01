@@ -11,6 +11,7 @@ Point any Docker management tool — [Komodo](https://komo.do/), [Dockhand](http
 | App | Description | Default Port |
 |-----|-------------|-------------|
 | [Affine](docker_apps/affine) | Knowledge base and workspace (Notion alternative) | 3010 |
+| [DDNS Updater](docker_apps/ddns-updater) | Dynamic DNS record updater | 8000 |
 | [Dockhand](docker_apps/dockhand) | Docker container management | 3110 |
 | [Drone](docker_apps/drone) | CI/CD platform | — |
 | [Homarr](docker_apps/homarr) | Server dashboard with 40+ integrations | 7575 |
@@ -29,6 +30,14 @@ Point any Docker management tool — [Komodo](https://komo.do/), [Dockhand](http
 | [Rocket.Chat](docker_apps/rocketchat) | Team communication | — |
 | [SnapOtter](docker_apps/snapotter) | Self-hosted image processing with local AI | 1349 |
 | [Trilium](docker_apps/trilium) | Personal knowledge base | — |
+
+## Stacks
+
+Pre-wired multi-app bundles (media servers + *arr automation, etc.) that spin up a full workflow in a single command. See [`docker_stacks/README.md`](docker_stacks/README.md) for the full list and conventions.
+
+| Stack | Description | Default Port(s) |
+|-------|-------------|-----------------|
+| _Coming soon_ | | |
 
 ## Quick Start
 
