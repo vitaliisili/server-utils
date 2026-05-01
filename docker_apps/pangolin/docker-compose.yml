@@ -43,7 +43,6 @@ services:
   traefik:
     image: docker.io/traefik:${TRAEFIK_IMAGE_TAG:-v3.6}
     container_name: traefik
-    user: "1000:1000"
     restart: unless-stopped
     network_mode: service:gerbil
     depends_on:
@@ -62,7 +61,6 @@ services:
     restart: unless-stopped
     environment:
       TZ: ${TZ:-UTC}
-      GID: "1000"
       COLLECTIONS: ${CROWDSEC_COLLECTIONS:-}
       ENROLL_INSTANCE_NAME: pangolin-crowdsec
       ENROLL_TAGS: docker
