@@ -80,6 +80,7 @@ services:
       COLLECTIONS: ${CROWDSEC_COLLECTIONS}
       ENROLL_INSTANCE_NAME: ${CROWDSEC_HOST}
       ENROLL_TAGS: ${CROWDSEC_ENROLL_TAGS}
+      BOUNCER_KEY_traefik-bouncer: ${CROWDSEC_BOUNCER_KEY}
     volumes:
       - ./config/crowdsec/db:/var/lib/crowdsec/data
       - ./config/crowdsec:/etc/crowdsec
