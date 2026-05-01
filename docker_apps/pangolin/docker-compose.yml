@@ -67,7 +67,6 @@ services:
       ENROLL_TAGS: docker
       BOUNCER_KEY_traefik-bouncer: ${CROWDSEC_BOUNCER_KEY}
     volumes:
-      - ./config/crowdsec:/etc/crowdsec
       - ./config/crowdsec/db:/var/lib/crowdsec/data
       - ./config/crowdsec/acquis.d:/etc/crowdsec/acquis.d
       - ./config/traefik/logs:/var/log/traefik:ro

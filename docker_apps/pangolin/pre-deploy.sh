@@ -59,6 +59,6 @@ render config-templates/traefik/traefik_config.yml.template config/traefik/traef
 render config-templates/traefik/dynamic_config.yml.template config/traefik/dynamic_config.yml
 
 # Static file (no variable substitution needed)
-cp config-templates/crowdsec/acquis.yaml config/crowdsec/acquis.yaml
+cp config-templates/crowdsec/acquis.yaml config/crowdsec/acquis.d/traefik.yaml
 
 echo "Render complete."
