@@ -1,5 +1,4 @@
 name: ddns-updater
-
 services:
   ddns-updater:
     image: ghcr.io/qdm12/ddns-updater:${DDNS_IMAGE_TAG:-latest}
@@ -23,11 +22,15 @@ services:
     ports:
       - "${DDNS_PORT:-8000}:8000/tcp"
     volumes:
-      - ./data:/updater/data
+      - ddns-updater-data:/updater/data
     networks:
       - ddns-network
     labels:
       komodo.skip:
+
+volumes:
+  ddns-updater-data:
+    name: ddns-updater-data
 
 networks:
   ddns-network:
