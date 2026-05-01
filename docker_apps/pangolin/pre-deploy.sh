@@ -20,6 +20,7 @@ mkdir -p config/db
 mkdir -p config/crowdsec/db
 mkdir -p config/crowdsec/acquis.d
 mkdir -p config/letsencrypt
+mkdir -p config/crowdsec/db/trace
 
 # Sanity check critical variables
 for var in DOMAIN DASHBOARD_SUBDOMAIN ADMIN_EMAIL LETSENCRYPT_EMAIL PANGOLIN_SERVER_SECRET CROWDSEC_BOUNCER_KEY; do
