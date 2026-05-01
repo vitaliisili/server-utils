@@ -16,6 +16,7 @@ echo "Rendering Pangolin config templates..."
 
 # Required directories
 mkdir -p config/traefik/logs
+mkdir -p config/db
 mkdir -p config/crowdsec/db
 mkdir -p config/crowdsec/acquis.d
 mkdir -p config/letsencrypt
