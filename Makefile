@@ -26,6 +26,7 @@ include docker_apps/rancher/Makefile
 include docker_apps/novu/Makefile
 include docker_apps/snapotter/Makefile
 include docker_apps/ddns-updater/Makefile
+include docker_apps/pangolin/Makefile
 
 # Remote server configuration - EDIT THESE IF ENV FILE IS NOT PRESENT
 REMOTE_USER ?= ubuntu
@@ -91,6 +92,8 @@ help: ## Show all available commands
 	@$(MAKE) -s snapotter-help
 	@echo ""
 	@$(MAKE) -s ddns-updater-help
+	@echo ""
+	@$(MAKE) -s pangolin-help
 
 push: ## Push docker_apps to remote server
 	@echo "Pushing $(LOCAL_PATH) to $(REMOTE_USER)@$(REMOTE_HOST):$(REMOTE_PATH)"

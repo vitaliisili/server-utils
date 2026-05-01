@@ -25,6 +25,7 @@ Point any Docker management tool — [Komodo](https://komo.do/), [Dockhand](http
 | [Novu](docker_apps/novu) | Notification infrastructure for developers | 4400 |
 | [ntfy](docker_apps/ntfy) | Push notifications | 8093 |
 | [OneUptime](docker_apps/oneuptime) | Uptime monitoring and status pages | 3210 |
+| [Pangolin](docker_apps/pangolin) | Tunneling reverse proxy (Traefik + WireGuard + CrowdSec) | 80, 443, 51820/udp |
 | [Portainer](docker_apps/portainer) | Docker management UI | — |
 | [Rancher](docker_apps/rancher) | Kubernetes container management platform | 9443 |
 | [Rocket.Chat](docker_apps/rocketchat) | Team communication | — |
