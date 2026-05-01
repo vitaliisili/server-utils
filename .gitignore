@@ -3,3 +3,4 @@
 **/.infisical-auth
 app_example/
 .codex
+.vscode/
