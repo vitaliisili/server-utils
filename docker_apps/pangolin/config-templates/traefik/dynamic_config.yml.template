@@ -1,9 +1,13 @@
 http:
   middlewares:
+    badger:
+      plugin:
+        badger:
+          disableForwardAuth: true
+
     redirect-to-https:
       redirectScheme:
         scheme: https
-        permanent: true
 
     crowdsec:
       plugin:
@@ -16,11 +20,11 @@ http:
           httpTimeoutSeconds: 10
           crowdsecMode: live
           crowdsecAppsecEnabled: true
-          crowdsecAppsecHost: ${CROWDSEC_HOST}:7422
+          crowdsecAppsecHost: crowdsec:7422
           crowdsecAppsecFailureBlock: true
           crowdsecAppsecUnreachableBlock: true
           crowdsecLapiKey: "${CROWDSEC_BOUNCER_KEY}"
-          crowdsecLapiHost: ${CROWDSEC_HOST}:8080
+          crowdsecLapiHost: crowdsec:8080
           crowdsecLapiScheme: http
           forwardedHeadersTrustedIPs:
             - 10.0.0.0/8
@@ -31,15 +35,68 @@ http:
             - 172.16.0.0/12
             - 192.168.0.0/16
 
+  routers:
+    main-app-router-redirect:
+      rule: "Host(`${DASHBOARD_SUBDOMAIN}.${DOMAIN}`)"
+      service: next-service
+      entryPoints:
+        - web
+      middlewares:
+        - redirect-to-https
+        - badger
+
+    next-router:
+      rule: "Host(`${DASHBOARD_SUBDOMAIN}.${DOMAIN}`) && !PathPrefix(`/api/v1`)"
+      service: next-service
+      entryPoints:
+        - websecure
+      middlewares:
+        - badger
+      tls:
+        certResolver: letsencrypt
+
+    api-router:
+      rule: "Host(`${DASHBOARD_SUBDOMAIN}.${DOMAIN}`) && PathPrefix(`/api/v1`)"
+      service: api-service
+      entryPoints:
+        - websecure
+      middlewares:
+        - badger
+      tls:
+        certResolver: letsencrypt
+
+    ws-router:
+      rule: "Host(`${DASHBOARD_SUBDOMAIN}.${DOMAIN}`)"
+      service: api-service
+      entryPoints:
+        - websecure
+      middlewares:
+        - badger
+      tls:
+        certResolver: letsencrypt
+
+  services:
+    next-service:
+      loadBalancer:
+        servers:
+          - url: "http://pangolin:3002"
+
+    api-service:
+      loadBalancer:
+        servers:
+          - url: "http://pangolin:3000"
+
 tls:
   options:
     default:
       minVersion: VersionTLS12
       sniStrict: true
-      cipherSuites:
-        - TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256
-        - TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384
-        - TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305
-        - TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-        - TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        - TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305
+
+tcp:
+  serversTransports:
+    pp-transport-v1:
+      proxyProtocol:
+        version: 1
+    pp-transport-v2:
+      proxyProtocol:
+        version: 2

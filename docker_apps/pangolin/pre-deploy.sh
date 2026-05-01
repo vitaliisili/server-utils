@@ -8,25 +8,28 @@ if [ -f .env ]; then
     set +a
     echo "Loaded variables from .env"
 else
-    echo "WARNING: .env not found in current directory"
+    echo "ERROR: .env not found"
+    exit 1
 fi
 
-echo "Rendering Pangolin config templates with pure bash..."
+echo "Rendering Pangolin config templates..."
 
+# Required directories
 mkdir -p config/traefik/logs
 mkdir -p config/crowdsec/db
 mkdir -p config/crowdsec/acquis.d
 mkdir -p config/letsencrypt
 
+# Sanity check critical variables
+for var in DOMAIN DASHBOARD_SUBDOMAIN ADMIN_EMAIL LETSENCRYPT_EMAIL PANGOLIN_SERVER_SECRET CROWDSEC_BOUNCER_KEY; do
+    if [ -z "${!var:-}" ]; then
+        echo "ERROR: required variable $var is empty"
+        exit 1
+    fi
+done
+
+# Variables to substitute in templates
 VARS=(
-    PANGOLIN_HOST
-    GERBIL_HOST
-    TRAEFIK_HOST
-    CROWDSEC_HOST
-    PANGOLIN_HTTP_PORT
-    PANGOLIN_HTTPS_PORT
-    PANGOLIN_WG_PORT
-    PANGOLIN_WG_RELAY_PORT
     DOMAIN
     DASHBOARD_SUBDOMAIN
     LETSENCRYPT_EMAIL
@@ -37,20 +40,13 @@ VARS=(
     TZ
 )
 
-# Sanity check — fail loud if a critical variable is empty
-for var in DOMAIN PANGOLIN_WG_PORT ADMIN_EMAIL; do
-    if [ -z "${!var:-}" ]; then
-        echo "ERROR: required variable $var is empty"
-        exit 1
-    fi
-done
-
 render() {
     local template="$1"
     local output="$2"
     cp "$template" "$output"
     for var in "${VARS[@]}"; do
         local value="${!var:-}"
+        # Escape sed-special chars
         value="${value//\\/\\\\}"
         value="${value//&/\\&}"
         value="${value//|/\\|}"
@@ -62,6 +58,7 @@ render config-templates/config.yml.template config/config.yml
 render config-templates/traefik/traefik_config.yml.template config/traefik/traefik_config.yml
 render config-templates/traefik/dynamic_config.yml.template config/traefik/dynamic_config.yml
 
+# Static file (no variable substitution needed)
 cp config-templates/crowdsec/acquis.yaml config/crowdsec/acquis.yaml
 
 echo "Render complete."

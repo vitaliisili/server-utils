@@ -2,101 +2,84 @@ name: pangolin
 
 services:
   pangolin:
-    image: docker.io/fosrl/pangolin:${PANGOLIN_IMAGE_TAG}
-    container_name: ${PANGOLIN_HOST}
-    hostname: ${PANGOLIN_HOST}
+    image: docker.io/fosrl/pangolin:${PANGOLIN_IMAGE_TAG:-ee-1.17.1}
+    container_name: pangolin
     restart: unless-stopped
-    environment:
-      TZ: ${TZ}
     volumes:
       - ./config:/app/config
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3001/api/v1/"]
-      interval: 10s
-      timeout: 10s
+      interval: "10s"
+      timeout: "10s"
       retries: 15
     networks:
-      - pangolin-network
-    labels:
-      komodo.skip:
+      - pangolin
 
   gerbil:
-    image: docker.io/fosrl/gerbil:${GERBIL_IMAGE_TAG}
-    container_name: ${GERBIL_HOST}
-    hostname: ${GERBIL_HOST}
+    image: docker.io/fosrl/gerbil:${GERBIL_IMAGE_TAG:-latest}
+    container_name: gerbil
     restart: unless-stopped
     depends_on:
       pangolin:
         condition: service_healthy
     command:
-      - --reachableAt=http://${GERBIL_HOST}:3004
+      - --reachableAt=http://gerbil:3004
       - --generateAndSaveKeyTo=/var/config/key
-      - --remoteConfig=http://${PANGOLIN_HOST}:3001/api/v1/
-      - --reportBandwidthTo=http://${PANGOLIN_HOST}:3001/api/v1/gerbil/receive-bandwidth
-    environment:
-      TZ: ${TZ}
+      - --remoteConfig=http://pangolin:3001/api/v1/
+      - --reportBandwidthTo=http://pangolin:3001/api/v1/gerbil/receive-bandwidth
     volumes:
-      - ./config:/var/config
+      - ./config/:/var/config
     cap_add:
       - NET_ADMIN
       - SYS_MODULE
     ports:
-      - "${PANGOLIN_WG_PORT}:51820/udp"
-      - "${PANGOLIN_WG_RELAY_PORT}:21820/udp"
-      - "${PANGOLIN_HTTPS_PORT}:443"
-      - "${PANGOLIN_HTTP_PORT}:80"
+      - "51820:51820/udp"
+      - "21820:21820/udp"
+      - "443:443"
+      - "80:80"
     networks:
-      - pangolin-network
-    labels:
-      komodo.skip:
+      - pangolin
 
   traefik:
-    image: docker.io/traefik:${TRAEFIK_IMAGE_TAG}
-    container_name: ${TRAEFIK_HOST}
+    image: docker.io/traefik:${TRAEFIK_IMAGE_TAG:-v3.6}
+    container_name: traefik
     restart: unless-stopped
-    network_mode: "service:${GERBIL_HOST}"
+    network_mode: service:gerbil
     depends_on:
       pangolin:
         condition: service_healthy
     command:
       - --configFile=/etc/traefik/traefik_config.yml
-    environment:
-      TZ: ${TZ}
     volumes:
       - ./config/traefik:/etc/traefik
       - ./config/letsencrypt:/letsencrypt
       - ./config/traefik/logs:/var/log/traefik
-    labels:
-      komodo.skip:
 
   crowdsec:
-    image: docker.io/crowdsecurity/crowdsec:${CROWDSEC_IMAGE_TAG}
-    container_name: ${CROWDSEC_HOST}
-    hostname: ${CROWDSEC_HOST}
+    image: docker.io/crowdsecurity/crowdsec:${CROWDSEC_IMAGE_TAG:-latest}
+    container_name: crowdsec
     restart: unless-stopped
     environment:
-      TZ: ${TZ}
-      GID: "${CROWDSEC_GID}"
-      COLLECTIONS: ${CROWDSEC_COLLECTIONS}
-      ENROLL_INSTANCE_NAME: ${CROWDSEC_HOST}
-      ENROLL_TAGS: ${CROWDSEC_ENROLL_TAGS}
+      TZ: ${TZ:-UTC}
+      GID: "1000"
+      COLLECTIONS: ${CROWDSEC_COLLECTIONS:-}
+      ENROLL_INSTANCE_NAME: pangolin-crowdsec
+      ENROLL_TAGS: docker
       BOUNCER_KEY_traefik-bouncer: ${CROWDSEC_BOUNCER_KEY}
     volumes:
-      - ./config/crowdsec/db:/var/lib/crowdsec/data
       - ./config/crowdsec:/etc/crowdsec
+      - ./config/crowdsec/db:/var/lib/crowdsec/data
       - ./config/crowdsec/acquis.d:/etc/crowdsec/acquis.d
       - ./config/traefik/logs:/var/log/traefik:ro
-    networks:
-      - pangolin-network
     healthcheck:
       test: ["CMD", "cscli", "version"]
       interval: 10s
       timeout: 5s
       retries: 5
-    labels:
-      komodo.skip:
+    networks:
+      - pangolin
 
 networks:
-  pangolin-network:
-    name: pangolin-network
+  pangolin:
+    name: pangolin
     driver: bridge

@@ -14,18 +14,18 @@ server:
   internal_port: 3001
   next_port: 3002
   secret: "${PANGOLIN_SERVER_SECRET}"
-  internal_hostname: "${PANGOLIN_HOST}"
+  internal_hostname: "pangolin"
   session_cookie_name: "p_session_token"
   resource_access_token_param: "p_token"
   resource_access_token_headers:
     id: "P-Access-Token-Id"
     token: "P-Access-Token"
-  resource_session_request_param: "resource_session_request_param"
+  resource_session_request_param: "p_session_request"
   cors:
     origins: ["https://${DASHBOARD_SUBDOMAIN}.${DOMAIN}"]
-    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"]
-    headers: ["Content-Type", "X-CSRF-Token", "Authorization"]
-    credentials: true
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"]
+    allowed_headers: ["X-CSRF-Token", "Content-Type"]
+    credentials: false
   trust_proxy: 1
 
 postgres:
@@ -37,7 +37,7 @@ traefik:
   https_entrypoint: "websecure"
 
 gerbil:
-  start_port: ${PANGOLIN_WG_PORT}
+  start_port: 51820
   base_endpoint: "${DASHBOARD_SUBDOMAIN}.${DOMAIN}"
   use_subdomain: false
   block_size: 24

@@ -4,7 +4,7 @@ api:
 
 providers:
   http:
-    endpoint: "http://${PANGOLIN_HOST}:3001/api/v1/traefik-config"
+    endpoint: "http://pangolin:3001/api/v1/traefik-config"
     pollInterval: "5s"
   file:
     filename: "/etc/traefik/dynamic_config.yml"
@@ -45,12 +45,6 @@ entryPoints:
     transport:
       respondingTimeouts:
         readTimeout: "30m"
-    http:
-      redirections:
-        entryPoint:
-          to: websecure
-          scheme: https
-          permanent: true
   websecure:
     address: ":443"
     transport:
@@ -61,6 +55,12 @@ entryPoints:
         certResolver: "letsencrypt"
       middlewares:
         - crowdsec@file
+      encodedCharacters:
+        allowEncodedSlash: true
+        allowEncodedQuestionMark: true
 
 serversTransport:
   insecureSkipVerify: true
+
+ping:
+  entryPoint: "web"
