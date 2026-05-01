@@ -1,15 +1,23 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# Load .env that Komodo wrote into this directory
+if [ -f .env ]; then
+    set -a
+    source .env
+    set +a
+    echo "Loaded variables from .env"
+else
+    echo "WARNING: .env not found in current directory"
+fi
+
 echo "Rendering Pangolin config templates with pure bash..."
 
-# Required directories
 mkdir -p config/traefik/logs
 mkdir -p config/crowdsec/db
 mkdir -p config/crowdsec/acquis.d
 mkdir -p config/letsencrypt
 
-# List variables to substitute (must match what's in templates)
 VARS=(
     PANGOLIN_HOST
     GERBIL_HOST
@@ -28,15 +36,20 @@ VARS=(
     TZ
 )
 
+# Sanity check — fail loud if a critical variable is empty
+for var in DOMAIN PANGOLIN_WG_PORT ADMIN_EMAIL; do
+    if [ -z "${!var:-}" ]; then
+        echo "ERROR: required variable $var is empty"
+        exit 1
+    fi
+done
+
 render() {
     local template="$1"
     local output="$2"
-
     cp "$template" "$output"
-
     for var in "${VARS[@]}"; do
         local value="${!var:-}"
-        # Escape sed-special chars: & / \ and the delimiter |
         value="${value//\\/\\\\}"
         value="${value//&/\\&}"
         value="${value//|/\\|}"
@@ -48,7 +61,6 @@ render config-templates/config.yml.template config/config.yml
 render config-templates/traefik/traefik_config.yml.template config/traefik/traefik_config.yml
 render config-templates/traefik/dynamic_config.yml.template config/traefik/dynamic_config.yml
 
-# Static file
 cp config-templates/crowdsec/acquis.yaml config/crowdsec/acquis.yaml
 
 echo "Render complete."
