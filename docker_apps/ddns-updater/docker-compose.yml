@@ -1,22 +1,35 @@
+name: ddns-updater
+
 services:
   ddns-updater:
-    image: ghcr.io/qdm12/ddns-updater:${DDNS_UPDATER_IMAGE_TAG:-latest}
-    container_name: ${CONTAINER_NAME:-ddns-updater}
+    image: ghcr.io/qdm12/ddns-updater:${DDNS_IMAGE_TAG:-latest}
+    container_name: ${DDNS_CONTAINER_NAME:-ddns-updater}
+    hostname: ddns-updater
     restart: unless-stopped
-    ports:
-      - "${DDNS_UPDATER_PORT:-8000}:8000/tcp"
-    volumes:
-      - ddns-updater-data:/updater/data
     environment:
-      PERIOD: ${PERIOD:-5m}
-      LOG_LEVEL: ${LOG_LEVEL:-info}
-      TZ: ${TZ:-Europe/Berlin}
+      TZ: ${TZ}
+      PERIOD: ${DDNS_PERIOD:-5m}
+      LOG_LEVEL: ${DDNS_LOG_LEVEL:-info}
+      CONFIG: |
+        {
+          "settings": [
+            {
+              "provider": "${DDNS_PROVIDER}",
+              "domain": "${DDNS_DOMAIN}",
+              "password": "${DDNS_PASSWORD}"
+            }
+          ]
+        }
+    ports:
+      - "${DDNS_PORT:-8000}:8000/tcp"
+    volumes:
+      - ./data:/updater/data
     networks:
-      - ddns-updater-network
-
-volumes:
-  ddns-updater-data:
-    name: ${VOLUME_NAME:-ddns-updater-data}
+      - ddns-network
+    labels:
+      komodo.skip:
 
 networks:
-  ddns-updater-network:
+  ddns-network:
+    name: ddns-network
+    driver: bridge
