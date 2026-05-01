@@ -43,6 +43,7 @@ services:
   traefik:
     image: docker.io/traefik:${TRAEFIK_IMAGE_TAG:-v3.6}
     container_name: traefik
+    user: "1000:1000"
     restart: unless-stopped
     network_mode: service:gerbil
     depends_on:
