@@ -1,0 +1,26 @@
+name: homepage
+
+services:
+  homepage:
+    image: ghcr.io/gethomepage/homepage:${HOMEPAGE_IMAGE_TAG:-latest}
+    container_name: ${HOMEPAGE_CONTAINER_NAME:-homepage}
+    hostname: homepage
+    restart: unless-stopped
+    ports:
+      - "${HOMEPAGE_PORT:-3310}:3000"
+    environment:
+      PUID: ${HOMEPAGE_PUID:-1000}
+      PGID: ${HOMEPAGE_PGID:-1000}
+      HOMEPAGE_ALLOWED_HOSTS: ${HOMEPAGE_ALLOWED_HOSTS:-*}
+    volumes:
+      - ${HOMEPAGE_CONFIG_PATH:-/opt/docker_data/homepage/config}:/app/config
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - homepage-network
+    labels:
+      komodo.skip:
+
+networks:
+  homepage-network:
+    name: homepage-network
+    driver: bridge

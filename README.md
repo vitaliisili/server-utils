@@ -15,6 +15,7 @@ Point any Docker management tool — [Komodo](https://komo.do/), [Dockhand](http
 | [Dockhand](docker_apps/dockhand) | Docker container management | 3110 |
 | [Drone](docker_apps/drone) | CI/CD platform | — |
 | [Homarr](docker_apps/homarr) | Server dashboard with 40+ integrations | 7575 |
+| [Homepage](docker_apps/homepage) | YAML-driven dashboard with Docker auto-discovery | 3310 |
 | [Infisical](docker_apps/infisical) | Secrets management | — |
 | [Jenkins](docker_apps/jenkins) | CI/CD pipeline | — |
 | [Komodo](docker_apps/komodo) | Server and deployment management | 9120 |
