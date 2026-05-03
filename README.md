@@ -11,8 +11,10 @@ Point any Docker management tool — [Komodo](https://komo.do/), [Dockhand](http
 | App | Description | Default Port |
 |-----|-------------|-------------|
 | [Affine](docker_apps/affine) | Knowledge base and workspace (Notion alternative) | 3010 |
+| [Anchor](docker_apps/anchor) | Documents and notes with embedded Postgres | 3510 |
 | [DDNS Updater](docker_apps/ddns-updater) | Dynamic DNS record updater | 8000 |
 | [Dockhand](docker_apps/dockhand) | Docker container management | 3110 |
+| [Glance](docker_apps/glance) | Single-page YAML dashboard (RSS, weather, monitors, ...) | 3410 |
 | [Drone](docker_apps/drone) | CI/CD platform | — |
 | [Homarr](docker_apps/homarr) | Server dashboard with 40+ integrations | 7575 |
 | [Homepage](docker_apps/homepage) | YAML-driven dashboard with Docker auto-discovery | 3310 |

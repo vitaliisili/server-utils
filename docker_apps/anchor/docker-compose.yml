@@ -1,0 +1,29 @@
+name: anchor
+
+services:
+  anchor:
+    image: ghcr.io/zhfahim/anchor:${ANCHOR_IMAGE_TAG:-latest}
+    container_name: ${ANCHOR_CONTAINER_NAME:-anchor}
+    hostname: anchor
+    restart: unless-stopped
+    ports:
+      - "${ANCHOR_PORT:-3510}:3000"
+    environment:
+      APP_URL: ${ANCHOR_APP_URL:-http://localhost:3510}
+      JWT_SECRET: ${ANCHOR_JWT_SECRET:-}
+      USER_SIGNUP: ${ANCHOR_USER_SIGNUP:-disabled}
+    volumes:
+      - anchor-data:/data
+    networks:
+      - anchor-network
+    labels:
+      komodo.skip:
+
+volumes:
+  anchor-data:
+    name: ${ANCHOR_VOLUME_NAME:-anchor-data}
+
+networks:
+  anchor-network:
+    name: anchor-network
+    driver: bridge

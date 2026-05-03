@@ -1,0 +1,22 @@
+name: glance
+
+services:
+  glance:
+    image: glanceapp/glance:${GLANCE_IMAGE_TAG:-latest}
+    container_name: ${GLANCE_CONTAINER_NAME:-glance}
+    hostname: glance
+    restart: unless-stopped
+    ports:
+      - "${GLANCE_PORT:-3410}:8080"
+    volumes:
+      - ${GLANCE_CONFIG_PATH:-/opt/docker_data/glance/config}:/app/config
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - glance-network
+    labels:
+      komodo.skip:
+
+networks:
+  glance-network:
+    name: glance-network
+    driver: bridge
